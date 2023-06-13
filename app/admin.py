@@ -8,10 +8,10 @@ from .models import Student, Teacher, User
 
 
 class StudentAdmin(admin.ModelAdmin):
-    list_display = ['id', 'username']
+    list_display = ["id", "email", "role"]
 
     def get_queryset(self, request: HttpRequest) -> QuerySet[Any]:
-        return super().get_queryset(request).filter(roll=Student.Role.STUDENT)
+        return super().get_queryset(request).filter(role=Student.Role.STUDENT)
 
 
 admin.site.register(User)

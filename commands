@@ -1,0 +1,20 @@
+#!/bin/bash
+
+arg=$1
+
+case "$arg" in
+    'user') python manage.py createsuperuser --username admin --email admin@email.com;;
+    'migrate')
+        python manage.py makemigrations
+        python manage.py migrate
+        ;;
+    'run') python manage.py runserver;;
+    'commit')
+        read -p 'message: ' message
+        echo $message
+        git add .
+        git commit -m "$(echo $message)"
+        git push -u origin $(git branch --show-current)
+        ;;
+    *) echo 'Invalid Command';;
+esac
