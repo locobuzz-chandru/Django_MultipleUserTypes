@@ -1,4 +1,4 @@
-from django.contrib.auth.models import Group, Permission
+from django.contrib.auth.models import (Group, Permission)
 
 
 def add_group_and_permissions(actions: list, group_name: str):

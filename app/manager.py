@@ -1,5 +1,5 @@
-from django.contrib.auth.models import Group, UserManager
-from app.permissions import create_teacher_group, create_student_group
+from django.contrib.auth.models import UserManager
+from app.permissions import (create_teacher_group, create_student_group)
 
 
 class StudentManager(UserManager):

@@ -1,6 +1,6 @@
 import json
 from django.http import JsonResponse
-from app.models import Student, Teacher, User
+from app.models import (Student, Teacher, User)
 
 
 def root(request):
