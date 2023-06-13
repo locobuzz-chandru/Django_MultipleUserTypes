@@ -1,16 +1,17 @@
 import json
 from django.http import JsonResponse
-from app.models import Student, Teacher
+from app.models import Student, Teacher, User
 
 
 def root(request):
-    students = Student.objects.values_list("username", flat=True)
-    teachers = Teacher.objects.values_list("username", flat=True)
-    data = {
-        "Students": [student for student in students],
-        "Teachers": [teacher for teacher in teachers]
-    }
-    return JsonResponse(data)
+    fields = ["id", "username", "is_staff", "is_superuser", "role"]
+    return JsonResponse(
+        {
+            "all_users": User.objects.count(),
+            "teachers": list(Teacher.objects.values(*fields)),
+            "students": list(Student.objects.values(*fields)),
+        }
+    )
 
 
 def fun(request, model):
