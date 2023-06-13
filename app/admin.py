@@ -5,7 +5,16 @@ from django.http.request import HttpRequest
 from .models import Student, Teacher, User
 
 
-class UserAdmin(admin.ModelAdmin):
+class StudentAdmin(admin.ModelAdmin):
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet[Any]:
+        qs = super().get_queryset(request)
+        if request.user.is_superuser or request.user.role == User.Role.TEACHER:
+            return qs
+        return qs.filter(id=request.user.id)
+
+
+class TeacherAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request: HttpRequest) -> QuerySet[Any]:
         qs = super().get_queryset(request)
@@ -15,8 +24,8 @@ class UserAdmin(admin.ModelAdmin):
 
 
 admin.site.register(User)
-admin.site.register(Student, UserAdmin)
-admin.site.register(Teacher, UserAdmin)
+admin.site.register(Student, StudentAdmin)
+admin.site.register(Teacher, TeacherAdmin)
 
 # Student.objects.create_student(username='s5', password='s5')
 # python manage.py shell

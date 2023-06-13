@@ -1,4 +1,5 @@
 from django.contrib.auth.models import (Group, UserManager)
+from app import models
 
 
 class MyManager(UserManager):
@@ -22,9 +23,17 @@ class StudentManager(MyManager):
         return super()._add_user_to_group("student",
                                           self.create(username, email, password, **extra_fields))
 
+    def get_queryset(self, *args, **kwargs):
+        results = super().get_queryset(*args, **kwargs)
+        return results.filter(role=models.User.Role.STUDENT)
+
 
 class TeacherManager(MyManager):
 
     def create_teacher(self, username, email=None, password=None, **extra_fields):
         return super()._add_user_to_group("staff",
                                           self.create(username, email, password, **extra_fields))
+
+    def get_queryset(self, *args, **kwargs):
+        results = super().get_queryset(*args, **kwargs)
+        return results.filter(role=models.User.Role.TEACHER)
