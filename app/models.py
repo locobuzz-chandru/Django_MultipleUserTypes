@@ -1,7 +1,6 @@
+from django.contrib.auth.models import (AbstractUser, BaseUserManager, Group,
+                                        UserManager)
 from django.db import models
-from django.contrib.auth.models import AbstractUser, BaseUserManager
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 
 class User(AbstractUser):
@@ -17,10 +16,23 @@ class User(AbstractUser):
     def save(self, *args, **kwargs):
         if not self.pk:
             self.role = self.base_role
-            return super().save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
 
-class StudentManager(BaseUserManager):
+class StudentManager(UserManager):
+
+    def _add_user_to_group(self, group_name, user_obj):
+        group = Group.objects.get(name=group_name)
+        user_obj.groups.add(group)
+        user_obj.save()
+        return user_obj
+
+    def create_student(self, username, email=None, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", False)
+        user = self._create_user(username, email, password, **extra_fields)
+        return self._add_user_to_group("student", user)
+
     def get_queryset(self, *args, **kwargs):
         results = super().get_queryset(*args, **kwargs)
         return results.filter(role=User.Role.STUDENT)
@@ -29,23 +41,13 @@ class StudentManager(BaseUserManager):
 class Student(User):
     base_role = User.Role.STUDENT
 
-    student = StudentManager()
+    objects = StudentManager()
 
     class Meta:
         proxy = True
 
 
-@receiver(post_save, sender=Student)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created and instance.role == "STUDENT":
-        StudentProfile.objects.create(user=instance)
-
-
-class StudentProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-
-
-class TeacherManager(BaseUserManager):
+class TeacherManager(UserManager):
     def get_queryset(self, *args, **kwargs):
         results = super().get_queryset(*args, **kwargs)
         return results.filter(role=User.Role.TEACHER)
@@ -58,13 +60,3 @@ class Teacher(User):
 
     class Meta:
         proxy = True
-
-
-class TeacherProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-
-
-@receiver(post_save, sender=Teacher)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created and instance.role == "TEACHER":
-        TeacherProfile.objects.create(user=instance)
