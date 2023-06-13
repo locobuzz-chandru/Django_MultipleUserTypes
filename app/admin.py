@@ -26,8 +26,3 @@ class TeacherAdmin(admin.ModelAdmin):
 admin.site.register(User)
 admin.site.register(Student, StudentAdmin)
 admin.site.register(Teacher, TeacherAdmin)
-
-# Student.objects.create_student(username='s5', password='s5')
-# python manage.py shell
-# from app.models import Student, Teacher
-# Teacher.objects.create_teacher(username='t5', password='t5')
