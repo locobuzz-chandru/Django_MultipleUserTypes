@@ -1,9 +1,9 @@
 from django.contrib.auth.models import UserManager as BaseUserManager
-from app.permissions import get_or_create_group
+from django.contrib.auth.models import Group
 
 
 def _add_user_to_group(obj, group_name):
-    group = get_or_create_group(group_name)
+    group = Group.objects.get(name=group_name)
     obj.groups.add(group)
     obj.save()
     return obj
