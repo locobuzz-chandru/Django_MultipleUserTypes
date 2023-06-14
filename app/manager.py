@@ -1,11 +1,11 @@
 from django.contrib.auth.models import UserManager
-from app.permissions import (create_teacher_group, create_student_group)
+from app.permissions import get_or_create_group
 
 
 class StudentManager(UserManager):
     @staticmethod
     def _add_user_to_group(obj):
-        group = create_student_group(group_name="student")
+        group = get_or_create_group(group_name="student")
         obj.groups.add(group)
         obj.save()
         return obj
@@ -28,7 +28,7 @@ class TeacherManager(UserManager):
 
     @staticmethod
     def _add_user_to_group(obj):
-        group = create_teacher_group(group_name="teacher")
+        group = get_or_create_group(group_name="teacher")
         obj.groups.add(group)
         obj.save()
         return obj

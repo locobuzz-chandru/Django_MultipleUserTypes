@@ -1,5 +1,7 @@
 import json
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
 from app.models import (Student, Teacher, User)
 
 
@@ -26,9 +28,11 @@ def fun(request, model):
         return JsonResponse({"message": str(e)}, status=400)
 
 
+@csrf_exempt
 def add_teacher(request):
     return fun(request, Teacher)
 
 
+@csrf_exempt
 def add_student(request):
     return fun(request, Student)

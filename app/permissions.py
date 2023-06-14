@@ -1,19 +1,18 @@
 from django.contrib.auth.models import (Group, Permission)
+from django.conf import settings
 
 
-def add_group_and_permissions(actions: list, group_name: str):
-    permissions = [Permission.objects.get(codename=codename) for codename in actions]
-    group, _ = Group.objects.get_or_create(name=group_name)
-    group.permissions.set(list(permissions))
-    group.save()
+def _get_codenames(group_name: str):
+    group = settings.GROUP_PERMISSIONS.get(group_name)
+    return [f"{action}_{model}" for model, actions in group.items() for action in actions]
+
+
+def get_or_create_group(group_name: str):
+    group = Group.objects.filter(name=group_name).first()
+    if group is None:
+        codenames: list = _get_codenames(group_name=group_name)
+        permissions = [Permission.objects.get(codename=codename) for codename in codenames]
+        group = Group.objects.create(name=group_name)
+        group.permissions.set(list(permissions))
+        group.save()
     return group
-
-
-def create_teacher_group(group_name):
-    codenames = ["add_student", "change_student", "view_student", "view_teacher"]
-    return add_group_and_permissions(actions=codenames, group_name=group_name)
-
-
-def create_student_group(group_name):
-    codenames = ["view_student"]
-    return add_group_and_permissions(actions=codenames, group_name=group_name)
