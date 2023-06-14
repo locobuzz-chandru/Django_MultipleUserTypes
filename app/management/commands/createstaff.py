@@ -37,7 +37,7 @@ class Command(BaseCommand):
 
         self.stdout.write(
             self.style.SUCCESS(
-                "Teacher %(name)s added successfully"
+                "Staff %(name)s added successfully"
                 % {"name": obj.username}
             )
         )
