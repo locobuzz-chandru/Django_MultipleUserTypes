@@ -8,11 +8,10 @@ def _get_codenames(group_name: str):
 
 
 def get_or_create_group(group_name: str):
-    group = Group.objects.filter(name=group_name).first()
-    if group is None:
+    group, is_created = Group.objects.get_or_create(name=group_name)
+    if is_created:
         codenames: list = _get_codenames(group_name=group_name)
         permissions = [Permission.objects.get(codename=codename) for codename in codenames]
-        group = Group.objects.create(name=group_name)
         group.permissions.set(list(permissions))
         group.save()
     return group

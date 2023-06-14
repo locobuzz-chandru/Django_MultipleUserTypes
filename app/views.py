@@ -1,7 +1,6 @@
 import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-
 from app.models import (Student, Teacher, User)
 
 
@@ -19,10 +18,7 @@ def root(request):
 def fun(request, model):
     try:
         data = json.loads(request.body)
-        if model == Teacher:
-            Teacher.objects.create_teacher(**data)
-        elif model == Student:
-            Student.objects.create_student(**data)
+        model.objects.create_staff(**data)
         return JsonResponse({"message": "created"}, status=201)
     except Exception as e:
         return JsonResponse({"message": str(e)}, status=400)

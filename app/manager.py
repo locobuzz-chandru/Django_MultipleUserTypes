@@ -1,20 +1,23 @@
-from django.contrib.auth.models import UserManager
+from django.contrib.auth.models import UserManager as BaseUserManager
 from app.permissions import get_or_create_group
 
 
-class StudentManager(UserManager):
-    @staticmethod
-    def _add_user_to_group(obj):
-        group = get_or_create_group(group_name="student")
-        obj.groups.add(group)
-        obj.save()
-        return obj
+def _add_user_to_group(obj, group_name):
+    group = get_or_create_group(group_name)
+    obj.groups.add(group)
+    obj.save()
+    return obj
 
-    def create_student(self, username, email=None, password=None, **extra_fields):
+
+class UserManager(BaseUserManager):
+    def create_staff(self, username, email=None, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", False)
         user = self._create_user(username, email, password, **extra_fields)
-        return self._add_user_to_group(user)
+        return _add_user_to_group(user, user.role.lower())
+
+
+class StudentManager(UserManager):
 
     def get_queryset(self, *args, **kwargs):
         results = super().get_queryset(*args, **kwargs)
@@ -25,16 +28,3 @@ class TeacherManager(UserManager):
     def get_queryset(self, *args, **kwargs):
         results = super().get_queryset(*args, **kwargs)
         return results.filter(role=self.model.Role.TEACHER)
-
-    @staticmethod
-    def _add_user_to_group(obj):
-        group = get_or_create_group(group_name="teacher")
-        obj.groups.add(group)
-        obj.save()
-        return obj
-
-    def create_teacher(self, username, email=None, password=None, **extra_fields):
-        extra_fields.setdefault("is_staff", True)
-        extra_fields.setdefault("is_superuser", False)
-        user = self._create_user(username, email, password, **extra_fields)
-        return self._add_user_to_group(user)
