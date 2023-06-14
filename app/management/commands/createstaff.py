@@ -13,8 +13,8 @@ class Command(BaseCommand):
         payload = {
             "username": input("username: "),
             "email": input("email: "),
-            "password1": getpass("Password: "),
-            "password2": getpass("Confirm Password: "),
+            "password": getpass("Password: "),
+            "password1": getpass("Confirm Password: "),
         }
         models = {
             "student": Student,
@@ -26,12 +26,10 @@ class Command(BaseCommand):
             raise KeyError("Entered Incorrect Staff Type")
         if not validate_email(payload.get("email")):
             raise InvalidEmailError("Entered Invalid Email")
-        if payload.get("password1") != payload.get("password2"):
+        if payload.get("password") != payload.get("password1"):
             raise PasswordMissMatchError("Passwords are not matching")
 
         payload.pop("password1")
-        password = payload.pop("password2")
-        payload["password"] = password
 
         obj = model.objects.create_staff(**payload)
 
